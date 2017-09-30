@@ -3,6 +3,7 @@ $(document).ready(function() {
   // all code to manipulate the DOM
   // goes inside this function
   var gameBoard = tttObjectCreate(3);
+  tttCreateBoard(gameBoard);
   console.log(gameBoard);
 });
 
@@ -30,12 +31,40 @@ function tttObjectCreate(rows){
 	return gameRows;
 }
 
+// Create function to loop througgh object and generate HTML
 function tttCreateBoard(gameObject){
-	var rowNum = gameObject.length;
-	for(var i = 0; i < rowNum; i++){
-		colNum = gameObject[i].rowArr.length;
+	//initialize DOM object to append items to
+	let gameBoardHTML = $.parseHTML('<div class="col-md-6 col-md-offset-3" id="board"></div>');
+	//grab row length for first for loop
+	let rowNum = gameObject.length;
+	for(var y = 0; y < rowNum; y++){
+	//Grab column length for nested loop
+		let colNum = gameObject[y].rowArr.length;
+		//initialize row DOM object
+		let rowHTML = $.parseHTML('<div class="row"></div>');
 		for(var x = 0; x < colNum; x++){
-			
+			//Initialize column DOM object with x and y attributes
+			let columnHTML = $(`<div class='col-md-4 box text-center' x='${x}' y='${y}'>${x}, ${y}</div>`);
+			$(rowHTML).append(columnHTML);
 		}
+		$(gameBoardHTML).append(rowHTML);
 	}
+	$('#game.row').append(gameBoardHTML)
+
+	//create event listeners on new DOM objects
+	createEventListeners()
 }
+
+//Add click listeners to new DOM elements
+function createEventListeners(){
+	clickBoardItem();
+}
+
+function clickBoardItem(){
+	let boardItem = $('.box');
+	boardItem.on('click',function(){
+		alert('you suck at clicking ya you totally suck');
+	})
+}
+
+
