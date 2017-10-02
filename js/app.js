@@ -1,11 +1,16 @@
 // wait for the DOM to finish loading
+// Initialize board size 
+// TODO make user inputable
 var gameSize = 4;  
+// Call and store gameboard object
 var gameBoard = tttObjectCreate(gameSize);
+// Create object for X and Y Coordinates of player and computer
 var movesMadeByPlayer = {x:[],y:[]};
 var movesMadeByOpponent = {x:[],y:[]};
 $(document).ready(function() {
   // all code to manipulate the DOM
   // goes inside this function
+  // Use gameboard object to create DOM elements
   tttCreateBoard(gameBoard);
 });
 
@@ -67,45 +72,72 @@ function createEventListeners(){
 	createBoardItemClick();
 }
 
+// Add click events to .box items
 function createBoardItemClick(){
+	// Select box items
 	let $boardItem = $('.box');
 	$boardItem.on('click',function(event){
+		// Grab the coordinates of the box selected
 		let x = $(this).attr("x");
 		let y = $(this).attr("y");
+
+		// Pass dom object and x and y coordinates to move function
 		makeMove(this,x,y);
 	});
 }
 
+// Function to complete player move
 function makeMove(target,x,y){
+	// Check to see if passed coordinates have been selected before
 	let checkMove = gameBoard[y].rowArr[x].selected;
+	// If the returned value is false ! to create true condition
 	if(!checkMove){
 		console.log("clicked");
+		// Update target text with X move
 		$(target).text("X")
+		// Update target attribute to having been clicked
 		$(target).attr('beenClicked','true');
+		// Update gamebaord 'database'
 		gameBoard[y].rowArr[x].selected = true;
+		// Pass coordinates selected and who made the move
 		storeActiveMoves(x,y,"player");
+
+		// Once player move complete, call computer move function
 		//opponentMakeMove();
 	}else{
 		console.log("wrong move!");
 	}
+
+	// Call function to check win conditions
 	checkWin();
 }
 
+// Computer 'AI' move function 
 function opponentMakeMove(){
+	// Grab all DOM objects not selected previously 
 	let $openMovesArr = $('.box[beenClicked="false"]');
+	// Create random index number to grab random DOM object
 	let i = Math.floor($openMovesArr.length*Math.random());
+
+	// If there are elements left, updated selected one with O and new beenclicked attribute
 	if($openMovesArr){
 		$($openMovesArr[i]).text("O");
 		$($openMovesArr[i]).attr("beenClicked","true");
+		// grab X and Y of selected DOM object
+		let x = $($openMovesArr[i]).attr('x');
+		let y = $($openMovesArr[i]).attr('y');
+		// Update gameboard DB
+		gameBoard[y].rowArr[x].selected = true;
+		//updated moves for opponent
+		storeActiveMoves(x,y,"opponent");
+		// Call function to check win conditions
+		checkWin();
 	}
-	let x = $($openMovesArr[i]).attr('x');
-	let y = $($openMovesArr[i]).attr('y');
-	gameBoard[y].rowArr[x].selected = true;
-	storeActiveMoves(x,y,"opponent");
 }
 
-//Store move coordinates 
+// Store move coordinates 
 function storeActiveMoves(x,y,player){
+	// Check for computer or player move
 	if(player === "player"){
 		movesMadeByPlayer.x.push(x);
 		movesMadeByPlayer.y.push(y);
@@ -117,34 +149,52 @@ function storeActiveMoves(x,y,player){
 	console.log(movesMadeByPlayer.y);
 }
 
+// function to check status of game after each play
 function checkWin(){
+	// Grab the number of plays made 
 	let numPlayerMoves = movesMadeByPlayer.x.length;
+	// Only run if there have been enough moves to satisfy a win
 	if(numPlayerMoves >= gameSize){
+		// Grab array of x coordinates of player moves
 		let playXMoves = movesMadeByPlayer.x; 
+		let opponentXMoves = movesMadeByOpponent.x;
+		// Grab arra of y coordinates of player moves
 		let playYMoves = movesMadeByPlayer.y; 
+		let opponentYMoves = movesMadeByOpponent.y; 
+		// Pass coordinates to win conditions functions
 		console.log(checkLineWin(playXMoves));
-		console.log(checkLineWin(playYMoves));
+		console.log(checkLineWin(playXMoves));
+		console.log(checkLineWin(opponentXMoves));
+		console.log(checkLineWin(opponentYMoves));
 		console.log(checkDiagonalWin(playXMoves,playYMoves));
+		console.log(checkDiagonalWin(opponentXMoves,opponentYMoves));
+
 	}
 
 }
 
+// Check for single line win (row or column)
 function checkLineWin(coordArr){
+	// Sort array from least to greatest
 	let sortedCoords = coordArr.sort();
+	// Initialize count for duplicate items and current match
 	let coordCount; 
 	let coordCurrent;
 	for(let i = 0; i < sortedCoords.length; i++){
+		// CHeck for duplicates if none then reset count and current match item
 		if(sortedCoords[i] != coordCurrent){
 			coordCurrent = sortedCoords[i];
 			coordCount = 1;
 		}else{
+			// if they do match add to dupe counter
 			coordCount++;
 		}
+		// If there are as many dupes as their are rows or columns then break loop
 		if(coordCount === gameSize){
 			break;
 		}
 	}
-
+	// If there are as many dupes as their are rows or columns then return 'true' for win
 	if(coordCount >= gameSize){
 		return true;
 	}else{
@@ -152,33 +202,32 @@ function checkLineWin(coordArr){
 	}
 }
 
+// Check for diagonal win condition
 function checkDiagonalWin(xCoordArr,yCoordArr){
+	// Initialize count of # of matches and array length
 	let coordMatchCount = 0;
 	let arrLength;
 	//console.log(xCoordArr);
 	// console.log(yCoordArr);
+	// Check if there are as many x coords as y coords and set array length
 	if(xCoordArr.length === yCoordArr.length){
 		arrLength = xCoordArr.length; 
 	}
+
+	// Iterate over arrays to compare matches at the same index
 	for(let i = 0; i < arrLength; i++){
 		if(xCoordArr[i] === yCoordArr[i]){
+			// Add to count if match made
 			coordMatchCount++;
 		}
 	}
+	// Make sure there are enough matches to satisfiy win condition and return true if win
 	if(coordMatchCount === gameSize){
 		return true;
 	}else{
 		return false;
 	}
 }
-
-
-
-
-
-
-
-
 
 
 
