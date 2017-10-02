@@ -163,7 +163,7 @@ function checkWin(){
 	let $openMovesArr = $('.box[beenClicked="false"]');
 	// Check if there are available moves
 	if($openMovesArr.length === 0){
-		console.log("NO MOVES, BITCH!");
+		// console.log("NO MOVES!");
 	}else if(numPlayerMoves >= gameSize){
 		// Grab array of x coordinates of player moves
 		let playXMoves = movesMadeByPlayer.x; 
@@ -172,9 +172,9 @@ function checkWin(){
 		let playYMoves = movesMadeByPlayer.y; 
 		let opponentYMoves = movesMadeByOpponent.y; 
 		// Pass coordinates to win conditions functions
-		console.log(checkLineWin(playXMoves));
-		console.log(checkLineWin(playYMoves));
-		console.log(checkDiagonalWin(playXMoves,playYMoves));
+		console.log(`Row win is ${checkLineWin(playXMoves)}`);
+		console.log(`Column win is ${checkLineWin(playYMoves)}`);
+		console.log(`Diagonal win is ${checkDiagonalWin(playXMoves,playYMoves)}`);
 		// console.log(checkLineWin(opponentXMoves));
 		// console.log(checkLineWin(opponentYMoves));
 		// console.log(checkDiagonalWin(opponentXMoves,opponentYMoves));	
