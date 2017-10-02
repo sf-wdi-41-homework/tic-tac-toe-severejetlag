@@ -1,12 +1,12 @@
 // wait for the DOM to finish loading
-var gameBoard = tttObjectCreate(4);
+var gameSize = 4;  
+var gameBoard = tttObjectCreate(gameSize);
+var movesMadeByPlayer = {x:[],y:[]};
+var movesMadeByOpponent = {x:[],y:[]};
 $(document).ready(function() {
   // all code to manipulate the DOM
   // goes inside this function
   tttCreateBoard(gameBoard);
-  console.log(gameBoard);
-
-
 });
 
 //function to create object of data 
@@ -80,13 +80,15 @@ function makeMove(target,x,y){
 	let checkMove = gameBoard[y].rowArr[x].selected;
 	if(!checkMove){
 		console.log("clicked");
+		$(target).text("X")
+		$(target).attr('beenClicked','true');
+		gameBoard[y].rowArr[x].selected = true;
+		storeActiveMoves(x,y,"player");
+		//opponentMakeMove();
 	}else{
 		console.log("wrong move!");
 	}
-	$(target).text("X")
-	$(target).attr('beenClicked','true');
-	gameBoard[y].rowArr[x].selected = true;
-	opponentMakeMove();
+	checkWin();
 }
 
 function opponentMakeMove(){
@@ -99,12 +101,86 @@ function opponentMakeMove(){
 	let x = $($openMovesArr[i]).attr('x');
 	let y = $($openMovesArr[i]).attr('y');
 	gameBoard[y].rowArr[x].selected = true;
-	console.log(gameBoard);
+	storeActiveMoves(x,y,"opponent");
+}
+
+//Store move coordinates 
+function storeActiveMoves(x,y,player){
+	if(player === "player"){
+		movesMadeByPlayer.x.push(x);
+		movesMadeByPlayer.y.push(y);
+	}else{
+		movesMadeByOpponent.x.push(x);
+		movesMadeByOpponent.y.push(y);
+	}
+	console.log(movesMadeByPlayer.x);
+	console.log(movesMadeByPlayer.y);
 }
 
 function checkWin(){
-	gameBoard.forEach(function(element){
-		console.log(element.rowArr);
-	})
+	let numPlayerMoves = movesMadeByPlayer.x.length;
+	if(numPlayerMoves >= gameSize){
+		let playXMoves = movesMadeByPlayer.x; 
+		let playYMoves = movesMadeByPlayer.y; 
+		console.log(checkLineWin(playXMoves));
+		console.log(checkLineWin(playYMoves));
+		console.log(checkDiagonalWin(playXMoves,playYMoves));
+	}
+
 }
+
+function checkLineWin(coordArr){
+	let sortedCoords = coordArr.sort();
+	let coordCount; 
+	let coordCurrent;
+	for(let i = 0; i < sortedCoords.length; i++){
+		if(sortedCoords[i] != coordCurrent){
+			coordCurrent = sortedCoords[i];
+			coordCount = 1;
+		}else{
+			coordCount++;
+		}
+		if(coordCount === gameSize){
+			break;
+		}
+	}
+
+	if(coordCount >= gameSize){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function checkDiagonalWin(xCoordArr,yCoordArr){
+	let coordMatchCount = 0;
+	let arrLength;
+	//console.log(xCoordArr);
+	// console.log(yCoordArr);
+	if(xCoordArr.length === yCoordArr.length){
+		arrLength = xCoordArr.length; 
+	}
+	for(let i = 0; i < arrLength; i++){
+		if(xCoordArr[i] === yCoordArr[i]){
+			coordMatchCount++;
+		}
+	}
+	if(coordMatchCount === gameSize){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
