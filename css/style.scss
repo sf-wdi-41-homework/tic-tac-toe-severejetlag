@@ -1,0 +1,11 @@
+.box{
+	box-sizing: border-box; 
+	background: #ddd;
+	font-size: 2em;
+	line-height: 4em;
+	border: 5px solid #fff;
+	&.x{
+		color: #0f0;
+	}
+	&.o{color: #f00;}
+}
