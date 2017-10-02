@@ -13,6 +13,9 @@ $(document).ready(function() {
   // Use gameboard object to create DOM elements
   $('#input-form').submit(function(event){
   	event.preventDefault();
+	if($('#board')){
+		tttDestroyBoard();
+	}
   	let inputSelector = $("#game-sise-input");
 	gameSize = parseInt(inputSelector.val());
 	inputSelector.val('');
@@ -74,7 +77,7 @@ function tttCreateBoard(gameObject){
 
 // Function to destroy board on reset
 function tttDestroyBoard(){
-	
+	$("#board").remove();
 }
 
 //Add click listeners to new DOM targets
@@ -109,7 +112,7 @@ function makeMove(target,x,y){
 		// Pass coordinates selected and who made the move
 		storeActiveMoves(x,y,"player");
 		// Once player move complete, call computer move function
-		opponentMakeMove();
+		// opponentMakeMove();
 	}else{
 		console.log("wrong move!");
 	}
@@ -148,8 +151,8 @@ function storeActiveMoves(x,y,player){
 		movesMadeByOpponent.x.push(x);
 		movesMadeByOpponent.y.push(y);
 	}
-	// console.log(movesMadeByPlayer.x);
-	// console.log(movesMadeByPlayer.y);
+	console.log(movesMadeByPlayer.x);
+	console.log(movesMadeByPlayer.y);
 }
 
 // function to check status of game after each play
@@ -158,7 +161,6 @@ function checkWin(){
 	let numPlayerMoves = movesMadeByPlayer.x.length;
 	// Only run if there have been enough moves to satisfy a win
 	let $openMovesArr = $('.box[beenClicked="false"]');
-	console.log($openMovesArr)
 	// Check if there are available moves
 	if($openMovesArr.length === 0){
 		console.log("NO MOVES, BITCH!");
@@ -172,10 +174,10 @@ function checkWin(){
 		// Pass coordinates to win conditions functions
 		console.log(checkLineWin(playXMoves));
 		console.log(checkLineWin(playYMoves));
-		console.log(checkLineWin(opponentXMoves));
-		console.log(checkLineWin(opponentYMoves));
 		console.log(checkDiagonalWin(playXMoves,playYMoves));
-		console.log(checkDiagonalWin(opponentXMoves,opponentYMoves));	
+		// console.log(checkLineWin(opponentXMoves));
+		// console.log(checkLineWin(opponentYMoves));
+		// console.log(checkDiagonalWin(opponentXMoves,opponentYMoves));	
 	}
 }
 
