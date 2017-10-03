@@ -54,7 +54,8 @@ function tttObjectCreate(rows){
 // Create function to loop througgh object and generate HTML
 function tttCreateBoard(gameObject){
 	//initialize DOM object to append items to
-	let gameBoardHTML = $.parseHTML('<div class="col-md-6 col-md-offset-3" id="board"></div>');
+	let gameBoardHTML = $.parseHTML('<div class="col-xs-12" id="board"></div>');
+	let resetButtonHTML = $.parseHTML('<div class="row" id="reset-button-container"><button type="button" class="btn btn-danger">Reset</button></div>')
 	//grab row length for first for loop
 	let rowNum = gameObject.length;
 	let boostrapColumn = 12/rowNum;
@@ -65,24 +66,30 @@ function tttCreateBoard(gameObject){
 		let rowHTML = $.parseHTML('<div class="row"></div>');
 		for(var x = 0; x < colNum; x++){
 			//Initialize column DOM object with x and y attributes
-			let columnHTML = $(`<div class='col-md-${boostrapColumn} box text-center' x='${x}' y='${y}' beenClicked='${gameBoard[y].rowArr[x].selected}''>${x}, ${y}</div>`);
+			let columnHTML = $(`<div class='col-xs-${boostrapColumn} box text-center' x='${x}' y='${y}' beenClicked='${gameBoard[y].rowArr[x].selected}''>${x}, ${y}</div>`);
 			$(rowHTML).append(columnHTML);
 		}
 		$(gameBoardHTML).append(rowHTML);
 	}
-	$('#game.row').append(gameBoardHTML)
+	$('#game.row').append(gameBoardHTML).after(resetButtonHTML);
 	//create event listeners on new DOM objects
 	createEventListeners()
 }
 
 // Function to destroy board on reset
 function tttDestroyBoard(){
+	// Remove board HTML
 	$("#board").remove();
+	$("#reset-button-container").remove();
+	// Reset Player and Opponent move trackers 
+	movesMadeByPlayer = {x:[],y:[]};
+	movesMadeByOpponent = {x:[],y:[]};
 }
 
 //Add click listeners to new DOM targets
 function createEventListeners(){
 	createBoardItemClick();
+	createResetButtonClick();
 }
 
 // Add click events to .box items
@@ -96,6 +103,16 @@ function createBoardItemClick(){
 		// Pass dom object and x and y coordinates to move function
 		makeMove(this,x,y);
 	});
+}
+
+// Function to control the resettin of the game board
+function createResetButtonClick(){
+	let $resetButton = $('#reset-button-container button');
+	$resetButton.on('click',function(){
+		tttDestroyBoard();
+		gameBoard = tttObjectCreate(gameSize);
+		tttCreateBoard(gameBoard);
+	})
 }
 
 // Function to complete player move
@@ -112,7 +129,7 @@ function makeMove(target,x,y){
 		// Pass coordinates selected and who made the move
 		storeActiveMoves(x,y,"player");
 		// Once player move complete, call computer move function
-		// opponentMakeMove();
+		opponentMakeMove();
 	}else{
 		console.log("wrong move!");
 	}
@@ -151,8 +168,6 @@ function storeActiveMoves(x,y,player){
 		movesMadeByOpponent.x.push(x);
 		movesMadeByOpponent.y.push(y);
 	}
-	console.log(movesMadeByPlayer.x);
-	console.log(movesMadeByPlayer.y);
 }
 
 // function to check status of game after each play
@@ -172,19 +187,25 @@ function checkWin(){
 		let playYMoves = movesMadeByPlayer.y; 
 		let opponentYMoves = movesMadeByOpponent.y; 
 		// Pass coordinates to win conditions functions
-		console.log(`Row win is ${checkLineWin(playXMoves)}`);
-		console.log(`Column win is ${checkLineWin(playYMoves)}`);
-		console.log(`Diagonal win is ${checkDiagonalWin(playXMoves,playYMoves)}`);
-		// console.log(checkLineWin(opponentXMoves));
-		// console.log(checkLineWin(opponentYMoves));
-		// console.log(checkDiagonalWin(opponentXMoves,opponentYMoves));	
+		let playerWin = checkLineWin(playXMoves) || checkLineWin(playYMoves) || checkDiagonalWin(playXMoves,playYMoves);
+		let opponentWin = checkLineWin(opponentXMoves) || checkLineWin(opponentYMoves) || checkDiagonalWin(opponentXMoves,opponentYMoves);
+		if(playerWin){
+			alert("You WON!");
+		}
 	}
 }
 
 // Check for single line win (row or column)
 function checkLineWin(coordArr){
 	// Sort array from least to greatest
-	let sortedCoords = coordArr.sort();
+	console.log("before sort")
+	console.log(movesMadeByPlayer.y);
+	console.log(movesMadeByPlayer.x);
+	let tempCoords = coordArr.slice();
+	let sortedCoords = tempCoords.sort();
+	console.log("after sort")
+	console.log(movesMadeByPlayer.y);
+	console.log(movesMadeByPlayer.x);
 	// Initialize count for duplicate items and current match
 	let coordCount; 
 	let coordCurrent;

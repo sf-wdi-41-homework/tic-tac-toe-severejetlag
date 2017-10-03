@@ -9,4 +9,9 @@
   .box.o {
     color: #f00; }
 
+#reset-button-container {
+  text-align: center; }
+  #reset-button-container button {
+    display: inline-block; }
+
 /*# sourceMappingURL=style.css.map */
