@@ -8,20 +8,29 @@ var gameBoard;
 var movesMadeByPlayer = {x:[],y:[]};
 var movesMadeByOpponent = {x:[],y:[]};
 $(document).ready(function() {
-  // all code to manipulate the DOM
-  // goes inside this function
-  // Use gameboard object to create DOM elements
-  $('#input-form').submit(function(event){
-  	event.preventDefault();
-	if($('#board')){
-		tttDestroyBoard();
-	}
-  	let inputSelector = $("#game-sise-input");
-	gameSize = parseInt(inputSelector.val());
-	inputSelector.val('');
-	gameBoard = tttObjectCreate(gameSize);
-	tttCreateBoard(gameBoard);
-  })
+  	// all code to manipulate the DOM
+  	// goes inside this function
+  	// Use gameboard object to create DOM elements
+  	$('#input-form').submit(function(event){
+	  	event.preventDefault();
+		if($('#board')){
+			tttDestroyBoard();
+		}
+	  	let inputSelector = $("#game-sise-input");
+		gameSize = parseInt(inputSelector.val());
+		inputSelector.val('');
+		gameBoard = tttObjectCreate(gameSize);
+		tttCreateBoard(gameBoard);
+  	})
+  	$(document).on('keyup','body',function(e) {
+		if (e.keyCode === 27 || e.keyCode===13) { // escape key maps to keycode `27`
+	        $('#modal').removeClass('active');
+	    }
+	});
+	$('#modal button').on('click', function(event){
+		event.preventDefault();
+		$('#modal').removeClass('active');
+	})
 });
 
 //function to create object of data 
@@ -129,22 +138,27 @@ function makeMove(target,x,y){
 		// Pass coordinates selected and who made the move
 		storeActiveMoves(x,y,"player");
 		// Once player move complete, call computer move function
-		opponentMakeMove();
+		if(!checkWin()){
+			opponentMakeMove();	
+		}else{
+			winAlert('player');
+		}
 	}else{
-		console.log("wrong move!");
+		$('#modal p').text('Wrong move!');
+		$('#modal').addClass('active');
 	}
 	// Call function to check win conditions
-	checkWin();
 }
 
 // Computer 'AI' move function 
 function opponentMakeMove(){
 	// Grab all DOM objects not selected previously 
+
 	let $openMovesArr = $('.box[beenClicked="false"]');
 	// Create random index number to grab random DOM object
 	let i = Math.floor($openMovesArr.length*Math.random());
 	// If there are elements left, updated selected one with O and new beenclicked attribute
-	if($openMovesArr){
+	if($openMovesArr.length > 0){
 		$($openMovesArr[i]).text('O').attr("beenClicked","true").addClass('o');
 		// grab X and Y of selected DOM object
 		let x = $($openMovesArr[i]).attr('x');
@@ -154,7 +168,13 @@ function opponentMakeMove(){
 		//updated moves for opponent
 		storeActiveMoves(x,y,"opponent");
 		// Call function to check win conditions
-		checkWin();
+		
+		if(checkWin()){
+			winAlert('computer');
+		}
+	}else{
+		$('#modal p').text("Stalemate!");
+		$('#modal').addClass('active');
 	}
 }
 
@@ -189,23 +209,20 @@ function checkWin(){
 		// Pass coordinates to win conditions functions
 		let playerWin = checkLineWin(playXMoves) || checkLineWin(playYMoves) || checkDiagonalWin(playXMoves,playYMoves);
 		let opponentWin = checkLineWin(opponentXMoves) || checkLineWin(opponentYMoves) || checkDiagonalWin(opponentXMoves,opponentYMoves);
-		if(playerWin){
-			alert("You WON!");
-		}
+		return playerWin || opponentWin;
 	}
+}
+
+function winAlert(winner){
+	$('#modal').addClass('active');
+	$('#modal p').text(`${winner} has won!`);
 }
 
 // Check for single line win (row or column)
 function checkLineWin(coordArr){
 	// Sort array from least to greatest
-	console.log("before sort")
-	console.log(movesMadeByPlayer.y);
-	console.log(movesMadeByPlayer.x);
 	let tempCoords = coordArr.slice();
 	let sortedCoords = tempCoords.sort();
-	console.log("after sort")
-	console.log(movesMadeByPlayer.y);
-	console.log(movesMadeByPlayer.x);
 	// Initialize count for duplicate items and current match
 	let coordCount; 
 	let coordCurrent;
