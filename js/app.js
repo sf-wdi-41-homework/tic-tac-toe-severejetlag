@@ -95,6 +95,12 @@ function tttDestroyBoard(){
 	movesMadeByOpponent = {x:[],y:[]};
 }
 
+// Function to update and display modal text 
+function displayModal(text){
+	$('#modal p').text(text);
+	$('#modal').addClass('active');
+}
+
 //Add click listeners to new DOM targets
 function createEventListeners(){
 	createBoardItemClick();
@@ -144,8 +150,7 @@ function makeMove(target,x,y){
 			winAlert('player');
 		}
 	}else{
-		$('#modal p').text('Wrong move!');
-		$('#modal').addClass('active');
+		displayModal('Wrong move!');
 	}
 	// Call function to check win conditions
 }
@@ -173,8 +178,7 @@ function opponentMakeMove(){
 			winAlert('computer');
 		}
 	}else{
-		$('#modal p').text("Stalemate!");
-		$('#modal').addClass('active');
+		displayModal('Stalemate!');
 	}
 }
 
@@ -209,13 +213,13 @@ function checkWin(){
 		// Pass coordinates to win conditions functions
 		let playerWin = checkLineWin(playXMoves) || checkLineWin(playYMoves) || checkDiagonalWin(playXMoves,playYMoves);
 		let opponentWin = checkLineWin(opponentXMoves) || checkLineWin(opponentYMoves) || checkDiagonalWin(opponentXMoves,opponentYMoves);
+		console.log(playerWin || opponentWin)
 		return playerWin || opponentWin;
 	}
 }
 
 function winAlert(winner){
-	$('#modal').addClass('active');
-	$('#modal p').text(`${winner} has won!`);
+	displayModal(`${winner} has won!`);
 }
 
 // Check for single line win (row or column)
