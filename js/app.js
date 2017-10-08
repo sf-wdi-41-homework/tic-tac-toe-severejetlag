@@ -1,27 +1,31 @@
 // wait for the DOM to finish loading
-// Initialize board size 
+// Initialize board size
 // TODO make user inputable
-var gameSize;  
+var gameSize;
 // Call and store gameboard object
 var gameBoard;
 // Create object for X and Y Coordinates of player and computer
 var movesMadeByPlayer = {x:[],y:[]};
 var movesMadeByOpponent = {x:[],y:[]};
 $(document).ready(function() {
-  	// all code to manipulate the DOM
+
+    // all code to manipulate the DOM
   	// goes inside this function
   	// Use gameboard object to create DOM elements
   	$('#input-form').submit(function(event){
 	  	event.preventDefault();
-		if($('#board')){
-			tttDestroyBoard();
-		}
+      // TODO: watch your indentation.
+  		if($('#board')){
+  			tttDestroyBoard();
+  		}
 	  	let inputSelector = $("#game-sise-input");
-		gameSize = parseInt(inputSelector.val());
-		inputSelector.val('');
-		gameBoard = tttObjectCreate(gameSize);
-		tttCreateBoard(gameBoard);
+  		gameSize = parseInt(inputSelector.val());
+  		inputSelector.val('');
+  		gameBoard = tttObjectCreate(gameSize);
+  		tttCreateBoard(gameBoard);
   	})
+
+    // TODO: keep separate code blocks visually separate with a blank line
   	$(document).on('keyup','body',function(e) {
 		if (e.keyCode === 27 || e.keyCode===13) { // escape key maps to keycode `27`
 	        $('#modal').removeClass('active');
@@ -31,29 +35,31 @@ $(document).ready(function() {
 		event.preventDefault();
 		$('#modal').removeClass('active');
 	})
-});
+}); /* END OF DOCUMENT READY */
 
-//function to create object of data 
+//function to create object of data
 function tttObjectCreate(rows){
 	if(12%rows !== 0){
 		rows = 3;
 	}
 	//Initialize gameBoard array to hold row objects
 	var gameRows = [];
+
 	//Looping for how many rows were passed by user
 	for(let i = 0; i < rows; i++){
 		//Creating empty object to fill row data
-		let boardRow = {}
-		boardRow.rowIndex = i; //declare row index
-		boardRow.rowArr = []; //declare rowArr to hold rowitems
+    let boardRow = {
+      rowIndex: i,
+      rowArr: []
+    };
 
 		//Looping over same row value to create row items
 		for(let x = 0; x < rows; x++){
-			boardItem = {}; //Creating empty object to fill boardItem data
-			boardItem.colIndex = x; //declaring column index
-			boardItem.text = `this is item ${x} row ${i}`;
-			boardItem.selected = false;
-			boardRow.rowArr.push(boardItem); //Adding object to rowArr array
+			boardRow.rowArr.push({
+        colIndex: x, //declaring column index
+        text: `this is item ${x} row ${i}`,
+        selected: false
+      });
 		}
 		gameRows.push(boardRow); //Adding row object to gameRows
 	}
@@ -90,12 +96,12 @@ function tttDestroyBoard(){
 	// Remove board HTML
 	$("#board").remove();
 	$("#reset-button-container").remove();
-	// Reset Player and Opponent move trackers 
+	// Reset Player and Opponent move trackers
 	movesMadeByPlayer = {x:[],y:[]};
 	movesMadeByOpponent = {x:[],y:[]};
 }
 
-// Function to update and display modal text 
+// Function to update and display modal text
 function displayModal(text){
 	$('#modal p').text(text);
 	$('#modal').addClass('active');
@@ -145,7 +151,7 @@ function makeMove(target,x,y){
 		storeActiveMoves(x,y,"player");
 		// Once player move complete, call computer move function
 		if(!checkWin()){
-			opponentMakeMove();	
+			opponentMakeMove();
 		}else{
 			winAlert('player');
 		}
@@ -155,9 +161,9 @@ function makeMove(target,x,y){
 	// Call function to check win conditions
 }
 
-// Computer 'AI' move function 
+// Computer 'AI' move function
 function opponentMakeMove(){
-	// Grab all DOM objects not selected previously 
+	// Grab all DOM objects not selected previously
 
 	let $openMovesArr = $('.box[beenClicked="false"]');
 	// Create random index number to grab random DOM object
@@ -173,7 +179,7 @@ function opponentMakeMove(){
 		//updated moves for opponent
 		storeActiveMoves(x,y,"opponent");
 		// Call function to check win conditions
-		
+
 		if(checkWin()){
 			winAlert('computer');
 		}
@@ -182,7 +188,7 @@ function opponentMakeMove(){
 	}
 }
 
-// Store move coordinates 
+// Store move coordinates
 function storeActiveMoves(x,y,player){
 	// Check for computer or player move
 	if(player === "player"){
@@ -196,7 +202,7 @@ function storeActiveMoves(x,y,player){
 
 // function to check status of game after each play
 function checkWin(){
-	// Grab the number of plays made 
+	// Grab the number of plays made
 	let numPlayerMoves = movesMadeByPlayer.x.length;
 	// Only run if there have been enough moves to satisfy a win
 	let $openMovesArr = $('.box[beenClicked="false"]');
@@ -205,11 +211,11 @@ function checkWin(){
 		// console.log("NO MOVES!");
 	}else if(numPlayerMoves >= gameSize){
 		// Grab array of x coordinates of player moves
-		let playXMoves = movesMadeByPlayer.x; 
+		let playXMoves = movesMadeByPlayer.x;
 		let opponentXMoves = movesMadeByOpponent.x;
 		// Grab arra of y coordinates of player moves
-		let playYMoves = movesMadeByPlayer.y; 
-		let opponentYMoves = movesMadeByOpponent.y; 
+		let playYMoves = movesMadeByPlayer.y;
+		let opponentYMoves = movesMadeByOpponent.y;
 		// Pass coordinates to win conditions functions
 		let playerWin = checkLineWin(playXMoves) || checkLineWin(playYMoves) || checkDiagonalWin(playXMoves,playYMoves);
 		let opponentWin = checkLineWin(opponentXMoves) || checkLineWin(opponentYMoves) || checkDiagonalWin(opponentXMoves,opponentYMoves);
@@ -228,7 +234,7 @@ function checkLineWin(coordArr){
 	let tempCoords = coordArr.slice();
 	let sortedCoords = tempCoords.sort();
 	// Initialize count for duplicate items and current match
-	let coordCount; 
+	let coordCount;
 	let coordCurrent;
 	for(let i = 0; i < sortedCoords.length; i++){
 		// CHeck for duplicates if none then reset count and current match item
@@ -261,7 +267,7 @@ function checkDiagonalWin(xCoordArr,yCoordArr){
 	// console.log(yCoordArr);
 	// Check if there are as many x coords as y coords and set array length
 	if(xCoordArr.length === yCoordArr.length){
-		arrLength = xCoordArr.length; 
+		arrLength = xCoordArr.length;
 	}
 	// Iterate over arrays to compare matches at the same index
 	for(let i = 0; i < arrLength; i++){
@@ -277,8 +283,3 @@ function checkDiagonalWin(xCoordArr,yCoordArr){
 		return false;
 	}
 }
-
-
-
-
-
